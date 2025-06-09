@@ -25,7 +25,7 @@ env:
 
 jobs:
   terraform:
-    name: "Apply terraform code changes"
+    name: "Apply Terraform code changes"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,13 +34,13 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4.2.2
+        # ใช้ v4 เพื่อให้ได้เวอร์ชันล่าสุดของ major version 4 โดยอัตโนมัติ
+        uses: actions/checkout@v4
 
-
-      - name: Setup Terraform with Specified version on the runner
+      - name: Setup Terraform with specified version on the runner
         uses: hashicorp/setup-terraform@v2
         # with:
-        #   terraform_version: 1.8.0 # You can change this to your specific version
+        #   terraform_version: 1.8.0
 
       - name: Terraform init
         id: init
@@ -57,8 +57,11 @@ jobs:
       - name: Terraform plan
         id: plan
         run: terraform plan -no-color -input=false -out planfile
+        # ให้ workflow ดำเนินการต่อแม้ plan จะล้มเหลว เพื่อไปรัน step ถัดไป
         continue-on-error: true
 
-      - name: Terraform plan status
+      - name: Check plan status
+        # ตรวจสอบว่า step ก่อนหน้า (id: plan) ล้มเหลวหรือไม่
         if: steps.plan.outcome == 'failure'
-        run: exit1 1
+        # ถ้าล้มเหลว ให้จบ workflow ด้วย status code 1 (error)
+        run: exit 1
