@@ -33,11 +33,14 @@ jobs:
         shell: bash
         working-directory: ./terraform
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v4.2.2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.3
+
 
       - name: Terraform init
         id: init
